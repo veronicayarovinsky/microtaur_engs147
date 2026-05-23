@@ -60,7 +60,7 @@ void loop() {
             t_imu_last = running ? t_imu_last + T_IMU_US : now;
             running    = true;
             imu_update();
-            heading_pd_update(drive_command.heading_ref_rad, intent.v_base_m_s, 0.0f);
+            heading_pd_update(drive_command.heading_ref_rad, drive_command.v_base_m_s, 0.0f);
             // Log
             float ref = intent.heading_ref_rad;
             float err = (ref - imu.heading_rad) * 180.f / PI;
