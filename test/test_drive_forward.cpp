@@ -68,14 +68,10 @@ void loop() {
             idx++;
         }
 
-        // ── 15ms: TOF + lateral PD ────────────────────────────────────────
-        if (!running || (now - t_tof_last) >= T_TOF_US) {
-            t_tof_last = running ? t_tof_last + T_TOF_US : now;
-            tof_trigger();
+        if (tof_read_if_ready()) {
+            lateral_pd_update();
         }
-        if (tof_read_if_ready()) lateral_pd_update();
 
-        // ── Drive primitive ───────────────────────────────────────────────
         if (drive_forward(CELL_SIZE_M, SPEED_NOMINAL)) {
             cells++;
             SerialUSB.print("Cell "); SerialUSB.print(cells);
