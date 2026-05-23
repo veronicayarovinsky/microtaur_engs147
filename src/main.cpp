@@ -40,6 +40,12 @@ void loop() {
     prog_start = current_time;
     prev_loop_start = current_time;
 
+    // ----- update display -----
+    if (current_time - t_last_display >= DISPLAY_TS) {
+        t_last_display += DISPLAY_TS;
+        display_update();   // ~5ms SPI transfer — safe here, never in 1ms block
+    }
+
     
 
     // update display

@@ -60,7 +60,7 @@ void loop() {
             t_imu_last = running ? t_imu_last + T_IMU_US : now;
             running    = true;
             imu_update();
-            heading_pd_update(intent.heading_ref_rad, intent.v_base_m_s, 0.0f);
+            heading_pd_update(drive_command.heading_ref_rad, intent.v_base_m_s, 0.0f);
             // Log
             float ref = intent.heading_ref_rad;
             float err = (ref - imu.heading_rad) * 180.f / PI;
@@ -77,7 +77,7 @@ void loop() {
         // ── Drive primitive ───────────────────────────────────────────────
         if (drive_turn(PI / 2.0f)) {
             turn++;
-            float err = (intent.heading_ref_rad - imu.heading_rad) * 180.f / PI;
+            float err = (drive_command.heading_ref_rad - imu.heading_rad) * 180.f / PI;
             SerialUSB.print("Turn "); SerialUSB.print(turn);
             SerialUSB.print(": "); SerialUSB.print(imu.heading_rad*180/PI, 2);
             SerialUSB.print(" deg  err="); SerialUSB.print(err, 2); SerialUSB.println(" deg");

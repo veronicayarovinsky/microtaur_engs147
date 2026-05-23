@@ -49,7 +49,7 @@ void loop() {
             t_imu_last = running ? t_imu_last + T_IMU_US : now;
             running    = true;
             imu_update();
-            heading_pd_update(intent.heading_ref_rad, intent.v_base_m_s,
+            heading_pd_update(drive_command.heading_ref_rad, drive_command.v_base_m_s,
                               lateral_pd_get_correction());
         }
 

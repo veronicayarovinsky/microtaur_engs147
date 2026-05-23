@@ -2,9 +2,9 @@
 #include "globals.h"
 #include "config.h"
 #include "encoder.h"
-#include "motor_pi.h"
-#include "heading_pd.h"
-#include "lateral_pd.h"
+#include "motor_control.h"
+#include "heading_control.h"
+#include "lateral_control.h"
 #include <Arduino.h>
 
 
@@ -27,8 +27,8 @@ void drive_stop() {
     lateral_pd_reset();
     lateral_pd_set_enabled(false);
     encoder_reset_odometry();
-    Micromouse::intent.v_base_m_s      = 0.0f;
-    Micromouse::intent.heading_ref_rad = Micromouse::imu.heading_rad;
+    Micromouse::drive_command.v_base_m_s      = 0.0f;
+    Micromouse::drive_command.heading_ref_rad = Micromouse::imu.heading_rad;
     Micromouse::motors.pwm_left  = 0;
     Micromouse::motors.pwm_right = 0;
     s_fwd_active  = false;

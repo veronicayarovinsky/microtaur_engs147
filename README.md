@@ -21,3 +21,8 @@ Other:
 
 
 
+
+maze code outputs:
+* coordinates of current cell    ex: (3,2)
+* direction
+

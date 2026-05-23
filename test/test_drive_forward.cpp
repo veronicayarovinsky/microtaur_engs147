@@ -54,7 +54,7 @@ void loop() {
             t_imu_last = running ? t_imu_last + T_IMU_US : now;
             running    = true;
             imu_update();
-            heading_pd_update(intent.heading_ref_rad, intent.v_base_m_s,
+            heading_pd_update(drive_command.heading_ref_rad, drive_command.v_base_m_s,
                               lateral_pd_get_correction());
             // Log at 10ms rate
             float he = (heading_ref - imu.heading_rad) * 180.f / PI;
@@ -76,7 +76,7 @@ void loop() {
         if (tof_read_if_ready()) lateral_pd_update();
 
         // ── Drive primitive ───────────────────────────────────────────────
-        if (drive_forward(CELL_SIZE_M, V_EXPLORE)) {
+        if (drive_forward(CELL_SIZE_M, SPEED_NOMINAL)) {
             cells++;
             SerialUSB.print("Cell "); SerialUSB.print(cells);
             SerialUSB.print(" done. dist=");

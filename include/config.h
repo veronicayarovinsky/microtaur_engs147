@@ -38,23 +38,33 @@ constexpr float SPEED_NOMINAL  = 0.20f;
 constexpr float SPEED_FAST  = 0.30f;        // placeholder speed, if we get here
 
 /* ***** Motor PI Controller Coefficients ***** */
+// Motor PI:   v_k =  v_{k-1} + B*e_k + C*e_{k-1}
 constexpr float DT_MOTORS  = T_CONTROL_US / 1e6f;   // dt = 0.001s (for control loop rate)
+constexpr float KP_MOTOR   = 1.0f;
+constexpr float KI_MOTOR   = 5.0f;
+constexpr float MOTOR_PI_B = KP_MOTOR   + KI_MOTOR   * DT_MOTORS;
+constexpr float MOTOR_PI_C = KP_HEADING - 2.0f * KD_HEADING / DT_HEADING;
 constexpr float MOTOR_PWM_MAX = 400.0f;     // max; do not exceed
 // +++++++++++++++++++++
 // ADD CONTROLLER COEFFS
 // +++++++++++++++++++++
 
 /* ***** Heading PD Controller Coefficients ***** */
+// Heading PD: v_k = -v_{k-1} + B*e_k + C*e_{k-1}
 constexpr float DT_HEADING = T_IMU_US     / 1e6f;   // dt = 0.010s (for control loop rate)
-// +++++++++++++++++++++
-// ADD CONTROLLER COEFFS
-// +++++++++++++++++++++
+constexpr float KP_HEADING = 2.0f;
+constexpr float KD_HEADING = 0.1f;
+constexpr float HEADING_PD_B =  KP_HEADING + 2.0f * KD_HEADING / DT_HEADING;
+constexpr float HEADING_PD_C =  KP_HEADING - 2.0f * KD_HEADING / DT_HEADING;
+
 
 /* ***** Lateral PD Controller Coefficients ***** */
+// Lateral PD: v_k = -v_{k-1} + B*e_k + C*e_{k-1}
 constexpr float DT_LATERAL = T_TOF_US     / 1e6f;   // dt = 0.015s (for control loop rate)
-// +++++++++++++++++++++
-// ADD CONTROLLER COEFFS
-// +++++++++++++++++++++
+constexpr float KP_LATERAL = 1.0f;
+constexpr float KD_LATERAL = 0.05f;
+constexpr float LATERAL_PD_B =  KP_LATERAL + 2.0f * KD_LATERAL / DT_LATERAL;
+constexpr float LATERAL_PD_C =  KP_LATERAL - 2.0f * KD_LATERAL / DT_LATERAL;
 
 
 /* ***** Maze Map ***** */
