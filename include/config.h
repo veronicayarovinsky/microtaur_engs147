@@ -13,6 +13,7 @@ constexpr unsigned long T_CONTROL_US = 1000;    // 1 ms — motor PI + heading P
 constexpr unsigned long T_IMU_US     = 10000;   // 10 ms — IMU read
 constexpr unsigned long T_TOF_US     = 15000;   // 15 ms — TOF read
 constexpr unsigned long T_DISPLAY_US = 250000;  // 250 ms — refresh display
+constexpr unsigned long SETUP_DELAY_MS = 200;
 
 /* ***** Physical Measurements ***** */
 constexpr float WHEEL_RADIUS_M = 0.01397f;  // 13.97 mm
