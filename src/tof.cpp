@@ -13,14 +13,14 @@
 
 #define DEV_I2C Wire
 
-// ----- TOF mux channels -----
+// TOF mux channels
 static constexpr uint8_t TOF_CH_LEFT       = 0;
 static constexpr uint8_t TOF_CH_RIGHT      = 1;
 static constexpr uint8_t TOF_CH_FRONT      = 2;
 static constexpr uint8_t TOF_CH_FRONT_LEFT = 3;
 static constexpr uint8_t TOF_CH_FRONT_RIGHT = 4;
 
-// ----- sensor objects -----
+// sensor objects
 static VL53L4CD tof_left(&DEV_I2C, A1);
 static VL53L4CD tof_right(&DEV_I2C, A1);
 static VL53L4CD tof_front(&DEV_I2C, A1);
