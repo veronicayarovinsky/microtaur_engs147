@@ -1,7 +1,7 @@
 #include "globals.h"
 
 namespace Micromouse {
-    EncoderData          encoder            = {};
+    EncoderData          encoders            = {};
     ImuData              imu                = {};
     TofData              tof                = {};
     DriveCommand         drive_command      = {};
