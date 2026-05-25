@@ -1,5 +1,5 @@
 #include "math.h"
-// for PWM functiob:
+// for PWM function:
 #define A 2.507
 #define B 0.384
 #define C -68.2
