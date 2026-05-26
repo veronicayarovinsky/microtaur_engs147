@@ -16,7 +16,10 @@
 #include "motor_control.h"
 #include "heading_control.h"
 #include "lateral_control.h"
+#include "flood_fill.h"
 #include "fsm.h"
+
+using namespace Micromouse;
 
 // hardware objects
 ArduinoMotorShieldR3 md;
@@ -40,8 +43,13 @@ void setup() {
     imu_init();
     tof_init();
 
+    motor_pi_init();
+    heading_pd_init();
+    lateral_pd_init();
+
     drive_init();
     fsm_init();
+    flood_init();
 
     // ensure all configuration is complete
     delay(SETUP_DELAY_MS);
@@ -62,10 +70,15 @@ void loop() {
 
     // update motor control loop
     if (current_time - t_last_control >= T_CONTROL_US) {
+        unsigned long actual_dt_us = current_time - t_last_control;
         t_last_control += T_CONTROL_US;
 
-        encoder_update();
-        motor_pi_update();
+        encoder_update(actual_dt_us);
+
+        motor_pi_update(
+            heading_pd_get_omega_left(),
+            heading_pd_get_omega_right()
+        );
 
         md.setM1Speed(motors.pwm_left);
         md.setM2Speed(motors.pwm_right);
@@ -76,15 +89,21 @@ void loop() {
         t_last_imu += T_IMU_US;
 
         imu_update();
-        heading_pd_update();
+
+        heading_pd_update(
+            drive_command.heading_ref_rad,
+            drive_command.v_base_m_s,
+            lateral_pd_get_correction()
+        );
     }
 
     // update tof loop
     if (current_time - t_last_tof >= T_TOF_US) {
         t_last_tof += T_TOF_US;
 
-        tof_read_if_ready();
-        lateral_pd_update();
+        if (tof_read_if_ready()) {
+            lateral_pd_update();
+        }
     }
 
     // update fsm
