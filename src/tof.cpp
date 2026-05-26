@@ -14,9 +14,9 @@
 #define DEV_I2C Wire
 
 // TOF mux channels
-static constexpr uint8_t TOF_CH_LEFT       = 0;
-static constexpr uint8_t TOF_CH_RIGHT      = 1;
-static constexpr uint8_t TOF_CH_FRONT      = 2;
+static constexpr uint8_t TOF_CH_LEFT = 0;
+static constexpr uint8_t TOF_CH_RIGHT = 1;
+static constexpr uint8_t TOF_CH_FRONT = 2;
 static constexpr uint8_t TOF_CH_FRONT_LEFT = 3;
 static constexpr uint8_t TOF_CH_FRONT_RIGHT = 4;
 
@@ -51,7 +51,7 @@ static void init_one_sensor(VL53L4CD &sensor, uint8_t channel) {
     sensor.InitSensor();
 
     // timing budget in ms
-    // Smaller = faster but noisier.
+    // smaller = faster but noisier
     sensor.VL53L4CD_SetRangeTiming(10, 0);
 
     sensor.VL53L4CD_StartRanging();
@@ -98,10 +98,15 @@ void tof_init() {
     Micromouse::tof.dist_left_m = TOF_MAX_RANGE_M;
     Micromouse::tof.dist_right_m = TOF_MAX_RANGE_M;
     Micromouse::tof.dist_front_m = TOF_MAX_RANGE_M;
+    Micromouse::tof.dist_front_left_m = TOF_MAX_RANGE_M;
+    Micromouse::tof.dist_front_right_m = TOF_MAX_RANGE_M;
 
     Micromouse::tof.wall_left = false;
     Micromouse::tof.wall_right = false;
     Micromouse::tof.wall_front = false;
+    Micromouse::tof.wall_front_left = false;
+    Micromouse::tof.wall_front_right = false;
+
     Micromouse::tof.data_refreshed = false;
 }
 
@@ -113,18 +118,14 @@ bool tof_read_if_ready() {
     got_any_new_data |= read_one_sensor(tof_left, TOF_CH_LEFT, tof.dist_left_m);
     got_any_new_data |= read_one_sensor(tof_right, TOF_CH_RIGHT, tof.dist_right_m);
     got_any_new_data |= read_one_sensor(tof_front, TOF_CH_FRONT, tof.dist_front_m);
-
-    // These are read for now, but not stored yet because globals.h does not currently
-    // have fields for angled sensors.
-    static float dist_front_left_m = TOF_MAX_RANGE_M;
-    static float dist_front_right_m = TOF_MAX_RANGE_M;
-
-    got_any_new_data |= read_one_sensor(tof_front_left, TOF_CH_FRONT_LEFT, dist_front_left_m);
-    got_any_new_data |= read_one_sensor(tof_front_right, TOF_CH_FRONT_RIGHT, dist_front_right_m);
+    got_any_new_data |= read_one_sensor(tof_front_left, TOF_CH_FRONT_LEFT, tof.dist_front_left_m);
+    got_any_new_data |= read_one_sensor(tof_front_right, TOF_CH_FRONT_RIGHT, tof.dist_front_right_m);
 
     tof.wall_left = tof.dist_left_m < WALL_PRESENT_M;
     tof.wall_right = tof.dist_right_m < WALL_PRESENT_M;
     tof.wall_front = tof.dist_front_m < WALL_PRESENT_M;
+    tof.wall_front_left = tof.dist_front_left_m < WALL_PRESENT_M;
+    tof.wall_front_right = tof.dist_front_right_m < WALL_PRESENT_M;
 
     tof.data_refreshed = got_any_new_data;
 
