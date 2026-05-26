@@ -11,7 +11,6 @@
 
 namespace Micromouse {
 
-    // ***** Encoder data — written by encoder.cpp *****
     struct EncoderData {
         long  enc_left;
         long  enc_right;
@@ -20,88 +19,79 @@ namespace Micromouse {
         float dist_traveled_m;
     };
 
-    // ***** IMU data — written by imu.cpp *****
     struct ImuData {
         float heading_rad;
         float omega_imu_rad_s;
         bool  ready;
     };
 
-    // ***** TOF data — written by tof.cpp *****
     struct TofData {
-        // Raw distances
         float dist_left_m = TOF_MAX_RANGE_M;
         float dist_right_m = TOF_MAX_RANGE_M;
         float dist_front_m = TOF_MAX_RANGE_M;
-        // Wall presence (computed by tof.cpp: dist < WALL_PRESENT_M)
-        bool  wall_left = false;
-        bool  wall_right = false;
-        bool  wall_front = false;
-        bool  data_refreshed = false;
+
+        // 45 degree sensors
+        float dist_front_left_m = TOF_MAX_RANGE_M;
+        float dist_front_right_m = TOF_MAX_RANGE_M;
+
+        bool wall_left = false;
+        bool wall_right = false;
+        bool wall_front = false;
+
+        // 45 degree sensor flags
+        bool wall_front_left = false;
+        bool wall_front_right = false;
+
+        bool data_refreshed = false;
     };
 
-    // ***** Drive Setpoints — written by fsm.cpp *****
-    // reference values / what the micromouse is told to do
-    // (v_base_m_s = 0) & (heading_ref = target) --> turn
-    // (v_base_m_s > 0) & (heading_ref = fixed)  --> drive straight
     struct DriveCommand {
         float v_base_m_s      = 0.0f;
         float heading_ref_rad = 0.0f;
     };
 
-    // ***** Motor Commands — written by motor_pi.cpp, read by drive.cpp *****
-    // pwm values actually sent to the motors
     struct MotorCommands {
         int pwm_left  = 0;
         int pwm_right = 0;
     };
 
-    // ***** Current Grid Cell written by fsm.cpp *****
-    // written by fsm.cpp
     struct GridCell {
         int x = 0;
         int y = 0;
     };
 
-    // ***** Walls At Current Cell – written by fsm.cpp *****
-    // read from TofData.wall_* when micromouse is in AT_CELL state
-    // stored separately from TofData so that FSM / maze logic has stable values
-    // since TofData is overwritten on every TOF control loop (~15ms)
-    // ++++++++++++++++++
-    // TODO: not sure if this is actually needed lol, maybe just reading from TofData is ok
-    // ++++++++++++++++++
     struct WallsCurrentCell {
         bool left  = false;
         bool right = false;
         bool front = false;
     };
 
-    // ***** FSM state – written by fsm.cpp *****
     enum class State {
-        INIT,               // waiting for button press
-        AT_CELL,            // stopped at cell — sense walls, decide next move
-        TURNING,            // drive_turn()
-        DRIVING_FORWARD,    // drive_forward()
-        PAUSED,             // stopped mid-run (for debugging); resumes when btn pressed
-        GOAL,               // reached goal cell (maze solved)
+        INIT,
+        AT_CELL,
+        TURNING,
+        DRIVING_FORWARD,
+        PAUSED,
+        GOAL,
         DONE
     };
 
-    // ***** Maze Map *****
     struct MazeMap {
         unsigned short walls[MAZE_SIZE][MAZE_SIZE] = {};
-        bool    visited[MAZE_SIZE][MAZE_SIZE] = {};
+        bool visited[MAZE_SIZE][MAZE_SIZE] = {};
     };
- 
-    extern EncoderData          encoders;
-    extern ImuData              imu;
-    extern TofData              tof;
-    extern DriveCommand         drive_command;
-    extern MotorCommands        motors;
-    extern GridCell             gridcell;
-    extern WallsCurrentCell     walls;
-    extern MazeMap              maze;
-    extern State                state;
+
+    extern EncoderData encoders;
+    extern ImuData imu;
+    extern TofData tof;
+    extern DriveCommand drive_command;
+    extern MotorCommands motors;
+    extern GridCell gridcell;
+    extern WallsCurrentCell walls;
+    extern MazeMap maze;
+    extern State state;
 }
+
+#endif
 
 #endif
