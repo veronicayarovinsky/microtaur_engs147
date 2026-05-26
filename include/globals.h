@@ -27,13 +27,22 @@ namespace Micromouse {
         bool  ready;
     };
 
+    struct ImuCalibrationStatus {
+        int   sys_cal   = 0;
+        int   gyr_cal   = 0;
+        int   acc_cal   = 0;
+        int   mag_cal   = 0;
+    };
+
     // ***** TOF data — written by tof.cpp *****
     struct TofData {
         // Raw distances
-        float dist_left_m = TOF_MAX_RANGE_M;
-        float dist_right_m = TOF_MAX_RANGE_M;
-        float dist_front_m = TOF_MAX_RANGE_M;
-        // Wall presence (computed by tof.cpp: dist < WALL_PRESENT_M)
+        float dist_left_mm = TOF_MAX_RANGE_MM;
+        float dist_diagL_mm = TOF_MAX_RANGE_MM;
+        float dist_right_mm = TOF_MAX_RANGE_MM;
+        float dist_diagR_mm = TOF_MAX_RANGE_MM;
+        float dist_front_mm = TOF_MAX_RANGE_MM;
+        // Wall presence (computed by tof.cpp: dist < WALL_PRESENT_MM)
         bool  wall_left = false;
         bool  wall_right = false;
         bool  wall_front = false;
@@ -70,9 +79,11 @@ namespace Micromouse {
     // ++++++++++++++++++
     // TODO: not sure if this is actually needed lol, maybe just reading from TofData is ok
     // ++++++++++++++++++
-    struct WallsCurrentCell {
+    struct Walls {
         bool left  = false;
+        bool leftdiag = false;
         bool right = false;
+        bool rightdiag = false;
         bool front = false;
     };
 
@@ -99,7 +110,7 @@ namespace Micromouse {
     extern DriveCommand         drive_command;
     extern MotorCommands        motors;
     extern GridCell             gridcell;
-    extern WallsCurrentCell     walls;
+    extern Walls                walls;
     extern MazeMap              maze;
     extern State                state;
 }
