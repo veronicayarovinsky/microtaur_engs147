@@ -1,13 +1,6 @@
-/**
- * @file tof.cpp
- * @brief reads VL53L4CD TOF sensors through PCA9548 I2C mux
- */
-
 #include "tof.h"
 #include "globals.h"
 #include "config.h"
-
-#include <Arduino.h>
 #include <Wire.h>
 #include <vl53l4cd_class.h>
 
@@ -27,16 +20,12 @@ static VL53L4CD tof_front(&DEV_I2C, A1);
 static VL53L4CD tof_front_left(&DEV_I2C, A1);
 static VL53L4CD tof_front_right(&DEV_I2C, A1);
 
+// select a single channel on the PCA9548 mux
 static void mux_select(uint8_t ch) {
-    if (ch > 7) {
-        return;
-    }
-
     Wire.beginTransmission(I2C_ADDR_PCA9548);
     Wire.write(1 << ch);
     Wire.endTransmission();
 }
-
 static void mux_disable() {
     Wire.beginTransmission(I2C_ADDR_PCA9548);
     Wire.write(0x00);
@@ -55,22 +44,34 @@ static void init_one_sensor(VL53L4CD &sensor, uint8_t channel) {
     sensor.VL53L4CD_SetRangeTiming(10, 0);
 
     sensor.VL53L4CD_StartRanging();
-
-    delay(10);
 }
 
-static bool read_one_sensor(VL53L4CD &sensor, uint8_t channel, float &distance_m) {
-    mux_select(channel);
 
-    uint8_t new_data_ready = 0;
-    uint8_t status = sensor.VL53L4CD_CheckForDataReady(&new_data_ready);
-
-    if (status || !new_data_ready) {
-        return false;
+void tof_init() {
+    uint8_t channels[NUM_TOF_SENSORS] = {TOF_CH_LEFT, TOF_CH_DIAG_L,
+                        TOF_CH_FRONT, TOF_CH_DIAG_R, TOF_CH_RIGHT};
+    for (int i = 0; i < NUM_TOF_SENSORS; i++) {
+        mux_select(channels[i]);
+        delay(50);
+        init_one_sensor();
+        delay(50);
+        mux_disable();
     }
+}
 
+// read one measurement (mm) from the currently selected channel
+// returns -1 if invalid
+int16_t readOneSensor() {
+    uint8_t ready = 0;
     VL53L4CD_Result_t result;
-
+    
+    // wait for data ready (with timeout)
+    unsigned long t0 = millis();
+    while (!ready && (millis() - t0 < 200)) {
+        sensor.VL53L4CD_CheckForDataReady(&ready);
+    }
+    if (!ready) return -1;
+    
     sensor.VL53L4CD_GetResult(&result);
     sensor.VL53L4CD_ClearInterrupt();
 

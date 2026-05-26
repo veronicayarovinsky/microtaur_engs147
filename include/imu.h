@@ -8,9 +8,9 @@
 #define IMU_H
 
 #include <Arduino.h>
-#include "config.h"
 
 void imu_init();
 void imu_update();
+void get_imu_calibration_status();
 
 #endif

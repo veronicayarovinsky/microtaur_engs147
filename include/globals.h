@@ -62,7 +62,9 @@ namespace Micromouse {
 
     struct WallsCurrentCell {
         bool left  = false;
+        bool leftdiag = false;
         bool right = false;
+        bool rightdiag = false;
         bool front = false;
     };
 
