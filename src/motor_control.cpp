@@ -1,11 +1,12 @@
 /**
  * @file motor_control.cpp
- * @brief PI wheel speed controller. Reads encoder speeds and writes motor PWM commands.
+ * @brief compensator-based wheel speed controller. Reads encoder speeds and writes motor PWM commands.
  */
 
 #include "motor_control.h"
 #include "globals.h"
 #include "config.h"
+
 #include <Arduino.h>
 
 // Motor direction signs
@@ -14,7 +15,14 @@
 static constexpr int LEFT_MOTOR_SIGN  = -1;
 static constexpr int RIGHT_MOTOR_SIGN =  1;
 
-// PI controller memory
+// Compensator coefficients
+// Difference equation:
+// u[k] = V1*u[k-1] + E*e[k] - E1*e[k-1]
+static constexpr float MOTOR_COMP_V1 = 1.0f;
+static constexpr float MOTOR_COMP_E  = 0.68337f;
+static constexpr float MOTOR_COMP_E1 = 0.5167f;
+
+// Controller memory
 static float s_left_output_prev  = 0.0f;
 static float s_right_output_prev = 0.0f;
 
@@ -43,11 +51,15 @@ void motor_pi_update(float omega_left_ref, float omega_right_ref) {
     float left_error  = omega_left_ref  - encoders.omega_left_rad_s;
     float right_error = omega_right_ref - encoders.omega_right_rad_s;
 
-    // PI difference equation
-    // u[k] = u[k-1] + B*e[k] + C*e[k-1]
-    float left_output = s_left_output_prev + MOTOR_PI_B * left_error + MOTOR_PI_C * s_left_error_prev;
+    // compensator difference equation
+    // u[k] = V1*u[k-1] + E*e[k] - E1*e[k-1]
+    float left_output = MOTOR_COMP_V1 * s_left_output_prev
+                      + MOTOR_COMP_E  * left_error
+                      - MOTOR_COMP_E1 * s_left_error_prev;
 
-    float right_output = s_right_output_prev + MOTOR_PI_B * right_error + MOTOR_PI_C * s_right_error_prev;
+    float right_output = MOTOR_COMP_V1 * s_right_output_prev
+                       + MOTOR_COMP_E  * right_error
+                       - MOTOR_COMP_E1 * s_right_error_prev;
 
     // clamp PWM commands
     left_output  = constrain(left_output,  -MOTOR_PWM_MAX, MOTOR_PWM_MAX);

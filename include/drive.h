@@ -1,8 +1,3 @@
-/**
- * @file drive.h
- * @brief basic actions; movement through maze consists of a sequence of these actions, called by the FSM in main.
- */
-
 #ifndef DRIVE_H
 #define DRIVE_H
 
