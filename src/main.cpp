@@ -1,6 +1,6 @@
 /**
  * @file main.cpp
- * @brief manages timing of control loops, sensor data readings, and fsm state transitions
+ * @brief motor control timing test
  */
 
 #include <Arduino.h>
@@ -8,110 +8,115 @@
 
 #include "config.h"
 #include "globals.h"
-#include "display.h"
 #include "encoder.h"
-#include "imu.h"
-#include "tof.h"
-#include "drive.h"
 #include "motor_control.h"
-#include "heading_control.h"
-#include "lateral_control.h"
-#include "flood_fill.h"
-#include "fsm.h"
 
 using namespace Micromouse;
 
 // hardware objects
 ArduinoMotorShieldR3 md;
 
-// timing assumes that each loop iteration completes in less than the shortest timer interval
+// test settings
+constexpr float TEST_OMEGA_LEFT_RAD_S = 20.0f;
+constexpr float TEST_OMEGA_RIGHT_RAD_S = 20.0f;
 
-// global variables
+constexpr unsigned long TEST_RUN_TIME_US = 5000000UL;   // 5 seconds
+constexpr unsigned long START_DELAY_MS = 3000;
+constexpr unsigned long T_PRINT_US = 100000UL;          // 100 ms
+
+// timing variables
 static unsigned long t_last_control = 0;
-static unsigned long t_last_imu = 0;
-static unsigned long t_last_tof = 0;
-static unsigned long t_last_display = 0;
+static unsigned long t_last_print = 0;
+static unsigned long t_start_run = 0;
+
+static bool test_running = false;
+static bool test_done = false;
 
 void setup() {
     SerialUSB.begin(BAUD_RATE);
 
-    // initialize hardware and software subsystems
+    delay(200);
+
+    SerialUSB.println("Motor control test starting...");
+    SerialUSB.println("Robot will wait 3 seconds before moving.");
+
+    // initialize hardware
     md.init();
-    display_init();
-
     encoder_init();
-    imu_init();
-    tof_init();
-
     motor_pi_init();
-    heading_pd_init();
-    lateral_pd_init();
 
-    drive_init();
-    fsm_init();
-    flood_init();
+    // make sure motors are stopped
+    md.setM1Speed(0);
+    md.setM2Speed(0);
 
-    // ensure all configuration is complete
-    delay(SETUP_DELAY_MS);
+    delay(START_DELAY_MS);
 
-    // initialize timing
     unsigned long current_time = micros();
 
     t_last_control = current_time;
-    t_last_imu = current_time;
-    t_last_tof = current_time;
-    t_last_display = current_time;
+    t_last_print = current_time;
+    t_start_run = current_time;
+
+    test_running = true;
+
+    SerialUSB.println("Test running.");
 }
 
 void loop() {
-
-    // loop-state variables
     unsigned long current_time = micros();
 
-    // update motor control loop
-    if (current_time - t_last_control >= T_CONTROL_US) {
+    // stop after test time
+    if (test_running && (current_time - t_start_run >= TEST_RUN_TIME_US)) {
+        test_running = false;
+        test_done = true;
+
+        motor_pi_reset();
+
+        md.setM1Speed(0);
+        md.setM2Speed(0);
+
+        SerialUSB.println("Test complete. Motors stopped.");
+    }
+
+    // 1 ms motor control loop
+    if (test_running && (current_time - t_last_control >= T_CONTROL_US)) {
         unsigned long actual_dt_us = current_time - t_last_control;
         t_last_control += T_CONTROL_US;
 
+        // update measured wheel speeds from encoders
         encoder_update(actual_dt_us);
 
+        // run motor compensator / PI controller
         motor_pi_update(
-            heading_pd_get_omega_left(),
-            heading_pd_get_omega_right()
+            TEST_OMEGA_LEFT_RAD_S,
+            TEST_OMEGA_RIGHT_RAD_S
         );
 
+        // send PWM commands to motor shield
         md.setM1Speed(motors.pwm_left);
         md.setM2Speed(motors.pwm_right);
     }
 
-    // update imu loop
-    if (current_time - t_last_imu >= T_IMU_US) {
-        t_last_imu += T_IMU_US;
+    // print debug data
+    if (current_time - t_last_print >= T_PRINT_US) {
+        t_last_print += T_PRINT_US;
 
-        imu_update();
+        SerialUSB.print("omega_L=");
+        SerialUSB.print(encoders.omega_left_rad_s, 3);
 
-        heading_pd_update(
-            drive_command.heading_ref_rad,
-            drive_command.v_base_m_s,
-            lateral_pd_get_correction()
-        );
+        SerialUSB.print(", omega_R=");
+        SerialUSB.print(encoders.omega_right_rad_s, 3);
+
+        SerialUSB.print(", pwm_L=");
+        SerialUSB.print(motors.pwm_left);
+
+        SerialUSB.print(", pwm_R=");
+        SerialUSB.println(motors.pwm_right);
     }
 
-    // update tof loop
-    if (current_time - t_last_tof >= T_TOF_US) {
-        t_last_tof += T_TOF_US;
-
-        if (tof_read_if_ready()) {
-            lateral_pd_update();
-        }
-    }
-
-    // update fsm
-    fsm_update();
-
-    // update display
-    if (current_time - t_last_display >= T_DISPLAY_US) {
-        t_last_display += T_DISPLAY_US;
-        display_update();   // ~5ms SPI transfer — safe here, never in 1ms block
+    // after test, keep motors paused
+    if (test_done) {
+        md.setM1Speed(0);
+        md.setM2Speed(0);
     }
 }
