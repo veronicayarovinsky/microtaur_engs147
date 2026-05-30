@@ -91,6 +91,11 @@ void encoder_reset_odometry() {
     Micromouse::encoders.enc_right = s_right_prev;
     Micromouse::encoders.omega_left_rad_s = 0.0f;
     Micromouse::encoders.omega_right_rad_s = 0.0f;
+<<<<<<< HEAD:src/encoder.cpp
     Micromouse::encoders.dist_traveled_mm = 0.0f;
     Micromouse::encoders.heading_rad = 0.0f;
 }
+=======
+    Micromouse::encoders.dist_traveled_m = 0.0f;
+}
+>>>>>>> origin/main:archive/encoder.cpp
