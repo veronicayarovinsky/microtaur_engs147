@@ -72,7 +72,7 @@ void display_print() {
     oled.clearDisplay();
     oled.setTextSize(2);
     oled.setCursor(0, 0);
-    oled.println("win!");
+    oled.println("maze solved!");
     oled.display();
 }
 

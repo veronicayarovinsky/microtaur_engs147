@@ -7,7 +7,7 @@
 void controllers_init();
 void controllers_reset();
 
-// velocity: target linear velocity (forward speed) [m/s]
+// velocity: target linear velocity (forward speed) [mm/s]
 // omega: target angular velocity [rad/s] (positive = CCW)
 void update_controllers(float velocity, float omega);
 
