@@ -9,55 +9,56 @@
 #include <Adafruit_BusIO_Register.h>
 
 // Set I2C bus to use: Wire, Wire1, etc.
-#define WIRE Wire
+#define WIRE Wire1
+#define S SerialUSB
 
 void setup() {
+    S.begin(115200);
+    while(!S){}
     WIRE.begin();
-
-    SerialUSB.begin(115200);
-    while (!SerialUSB)
-        delay(10);
-    SerialUSB.println("\nI2C Scanner");
+    WIRE.setClock(100000);
+    S.println("\nI2C Scanner");
 }
 
 
 void loop() {
-    byte error, address;
+    // byte error, address;
     int nDevices;
 
-    SerialUSB.println("Scanning...");
+    S.println("Scanning...");
 
     nDevices = 0;
-    for(address = 1; address < 127; address++ ) {
+    for(byte address = 1; address < 127; address++ ) {
         // The i2c_scanner uses the return value of
         // the Write.endTransmisstion to see if
         // a device did acknowledge to the address.
         WIRE.beginTransmission(address);
-        error = WIRE.endTransmission();
+        byte error = WIRE.endTransmission();
 
         if (error == 0) {
-        SerialUSB.print("I2C device found at address 0x");
+        S.print("I2C device found at address 0x");
         if (address<16)
-            Serial.print("0");
-        SerialUSB.print(address,HEX);
-        SerialUSB.println("  !");
+            S.print("0");
+        S.print(address,HEX);
+        S.println("  !");
 
         nDevices++;
         }
         else if (error==4) {
-            SerialUSB.print("Unknown error at address 0x");
+            S.print("Unknown error at address 0x");
             if (address<16) {
-                SerialUSB.print("0");
+                S.print("0");
             }
-            SerialUSB.println(address,HEX);
+            S.println(address,HEX);
         }
     }
     if (nDevices == 0) {
-        SerialUSB.println("No I2C devices found\n");
+        S.println("No I2C devices found\n");
     }   
     else {
-        SerialUSB.println("done\n");
+        S.println("done\n");
     }
 
     delay(5000);           // wait 5 seconds for next scan
+    // while(1);
 }

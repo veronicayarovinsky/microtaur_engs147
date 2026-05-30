@@ -53,7 +53,7 @@ static float s_omega_R_ref    = 0.0f;
 static float position_controller(float velocity) {
     using namespace Micromouse;
 
-    s_fwd_error      = s_fwd_error + (velocity * DT_MOTORS) - encoders.fwd_change_mm;
+    s_fwd_error      = s_fwd_error + (velocity * DT_CONTROL) - encoders.fwd_change_mm;
     s_prev_fwd_error = s_fwd_error;
 
     return FWD_KP * s_fwd_error + FWD_KD * (s_fwd_error - s_prev_fwd_error);
@@ -65,7 +65,7 @@ static float angle_controller(float omega) {
     using namespace Micromouse;
 
     // encoder-based
-    s_rot_error += s_rot_error + (omega * DT_MOTORS) - encoders.rot_change_rad;
+    s_rot_error = s_rot_error + (omega * DT_CONTROL) - encoders.rot_change_rad;
 
     // IMU-based
     // s_rot_target   = s_rot_target + (omega * DT_MOTORS);  // increment commanded heading
@@ -76,7 +76,7 @@ static float angle_controller(float omega) {
     // while (imu_err < -PI) {
     //     imu_err = imu_err + 2.0f * PI;
     // }
-    // s_rot_error    = imu_err;  // not accumulated — recomputed each tick from absolute heading
+    // s_rot_error    = imu_err;  // not accumulated — recomputed from absolute heading each time angle_controller fn is called
 
     float diff       = s_rot_error - s_prev_rot_error;
     s_prev_rot_error = s_rot_error;
@@ -91,13 +91,13 @@ static void motor_speed_controller(float omega_L_ref, float omega_R_ref) {
 
     // Left wheel
     float err_L    = omega_L_ref - encoders.omega_left_rad_s;
-    s_integral_L  += err_L * DT_MOTORS;
+    s_integral_L  += err_L * DT_CONTROL;
     s_integral_L   = constrain(s_integral_L, -MOTOR_INTEGRAL_MAX, MOTOR_INTEGRAL_MAX);
     float out_L    = SPEED_KP * err_L + SPEED_KI * s_integral_L;
 
     // Right wheel
     float err_R    = omega_R_ref - encoders.omega_right_rad_s;
-    s_integral_R  += err_R * DT_MOTORS;
+    s_integral_R  += err_R * DT_CONTROL;
     s_integral_R   = constrain(s_integral_R, -MOTOR_INTEGRAL_MAX, MOTOR_INTEGRAL_MAX);
     float out_R    = SPEED_KP * err_R + SPEED_KI * s_integral_R;
 
@@ -116,11 +116,11 @@ void update_controllers(float velocity, float omega) {
     float rot_output = angle_controller(omega);
 
     // kinematics mixer for differential drive
-    float v_L = fwd_output - rot_output * (TRACK_WIDTH_M / 2.0f);
-    float v_R = fwd_output + rot_output * (TRACK_WIDTH_M / 2.0f);
+    float v_L = fwd_output - rot_output * (TRACK_WIDTH_MM / 2.0f);
+    float v_R = fwd_output + rot_output * (TRACK_WIDTH_MM / 2.0f);
 
-    s_omega_L_ref = v_L / WHEEL_RADIUS_M;
-    s_omega_R_ref = v_R / WHEEL_RADIUS_M;
+    s_omega_L_ref = v_L / WHEEL_RADIUS_MM;
+    s_omega_R_ref = v_R / WHEEL_RADIUS_MM;
 
     motor_speed_controller(s_omega_L_ref, s_omega_R_ref);
 }

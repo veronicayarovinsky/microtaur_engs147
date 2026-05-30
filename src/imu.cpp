@@ -4,6 +4,10 @@
 #include <Wire.h>
 #include <Adafruit_BNO055.h>
 
+#define SENSOR_ID   55
+#define I2C_IMU     Wire
+#define S           Serial
+
 adafruit_bno055_offsets_t calibrationData = {
     -50, 37, -33,       // accel x,y,z
     85, -363, -559,     // mag   x,y,z
@@ -15,7 +19,7 @@ adafruit_bno055_offsets_t calibrationData = {
 Adafruit_BNO055 bno = Adafruit_BNO055(SENSOR_ID, I2C_ADDR_BNO055, &Wire);
 
 void imu_init() {
-    Wire.begin();
+    I2C_IMU.begin();
     bno.begin();
     bno.setMode(OPERATION_MODE_NDOF);  // or OPERATION_MODE_IMUPLUS if motors disturb mag
     delay(500);
@@ -42,8 +46,8 @@ void get_imu_calibration_status() {
     uint8_t s, g, a, m;
     bno.getCalibration(&s, &g, &a, &m);
 
-    Micromouse::imu_calibration.sys_cal = s;
-    Micromouse::imu_calibration.gyr_cal = g;
-    Micromouse::imu_calibration.acc_cal = a;
-    Micromouse::imu_calibration.mag_cal = m;
+    // Micromouse::imu_calibration.sys_cal = s;
+    // Micromouse::imu_calibration.gyr_cal = g;
+    // Micromouse::imu_calibration.acc_cal = a;
+    // Micromouse::imu_calibration.mag_cal = m;
 }

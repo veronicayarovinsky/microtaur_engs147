@@ -27,7 +27,7 @@ adafruit_bno055_offsets_t calibrationData = {
 };
 #endif
 
-Adafruit_BNO055 bno = Adafruit_BNO055(SENSOR_ID, BNO055_ADDR, &Wire);
+Adafruit_BNO055 bno = Adafruit_BNO055(SENSOR_ID, BNO055_ADDR, &Wire1);
 
 void setup() {
     SerialUSB.begin(BAUD_RATE);
