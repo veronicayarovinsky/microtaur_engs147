@@ -12,5 +12,6 @@
 
 void display_init();
 void display_update();
+void display_print();
 
 #endif

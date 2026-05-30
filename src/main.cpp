@@ -1,137 +1,75 @@
 /**
  * @file main.cpp
- * @brief closed-loop motor speed test
+ * @brief 
  */
 
 #include <Arduino.h>
 #include <ArduinoMotorShieldR3.h>
-
 #include "config.h"
 #include "globals.h"
+#include "display.h"
+#include "tof.h"
+#include "imu.h"
 #include "encoder.h"
-#include "motor_control.h"
+#include <ArduinoMotorShieldR3.h>
+#include <AxisEncoderShield3.h>
+#include "controllers.h"
+#include "drive.h"
+#include "flood_fill.h"
 
-using namespace Micromouse;
+// ArduinoMotorShieldR3 md;
 
 ArduinoMotorShieldR3 md;
 
-// ----- test settings -----
-constexpr float TEST_OMEGA_LEFT_RAD_S  = 12.0f;
-constexpr float TEST_OMEGA_RIGHT_RAD_S = 12.0f;
 
-constexpr unsigned long START_DELAY_MS = 3000;
-constexpr unsigned long TEST_RUN_TIME_US = 5000000UL;  // 5 seconds
-constexpr unsigned long T_PRINT_US = 100000UL;         // 100 ms
+// #define TEST_RUN_TIME_US 2000000
+#define DISPLAY_TS      250000UL            // update display every 250ms
+#define SETUP_DELAY_MS  200
+#define S SerialUSB
 
-// ----- timing variables -----
-static unsigned long t_last_control = 0;
-static unsigned long t_last_print = 0;
-static unsigned long t_start = 0;
+// static unsigned long t_start = 0;
+static unsigned long t_last_display   = 0;
 
-static bool test_running = false;
-static bool test_done = false;
-static bool stop_message_printed = false;
-
-void stop_motors() {
-    motor_pi_reset();
-
-    md.setM1Speed(0);
-    md.setM2Speed(0);
-
-    motors.pwm_left = 0;
-    motors.pwm_right = 0;
-}
 
 void setup() {
-    Serial.begin(115200);
-
+    S.begin(BAUD_RATE);
+    S.println("S1: initializing");
     delay(200);
-
-    Serial.println("Closed-loop motor speed test starting...");
-    Serial.println("Put robot on blocks with wheels off the ground.");
-    Serial.println("Starting in 3 seconds...");
-
+    display_init();
+    imu_init();
+    delay(400);
+    tof_init();
+    encoder_init();
     md.init();
     encoder_init();
-    motor_pi_init();
+    controllers_init();
+    drive_init();
 
-    stop_motors();
-
-    delay(START_DELAY_MS);
-
-    unsigned long current_time = micros();
-
-    t_last_control = current_time;
-    t_last_print = current_time;
-    t_start = current_time;
-
-    test_running = true;
-    test_done = false;
-    stop_message_printed = false;
-
-    Serial.println("time_s,omega_L_ref,omega_L,omega_R_ref,omega_R,pwm_L,pwm_R");
+    delay(SETUP_DELAY_MS);
+    S.println("Done initializing. Moving to ");
 }
 
+// outputs a change inputs 
+// float choose_direction(int Aglobal, int Awant) {
+//     Aturn = Aglobal - Awant;
+//     if (Aturn = 1 
+//     return Aturn
+// } 
+
 void loop() {
-    unsigned long current_time = micros();
-
-    // stop after test time
-    if (test_running && current_time - t_start >= TEST_RUN_TIME_US) {
-        test_running = false;
-        test_done = true;
-
-        stop_motors();
-
-        if (!stop_message_printed) {
-            Serial.println("Test complete. Motors stopped.");
-            stop_message_printed = true;
-        }
+    using namespace Micromouse;
+    // if x am I in cent
+    if (7 <= pose.x <= 8 && 7 <= pose.x <= 8) {
+        display_print();
+        while (true);
     }
 
-    // ----- 1 ms encoder/control loop -----
-    if (current_time - t_last_control >= T_CONTROL_US) {
-        unsigned long actual_dt_us = current_time - t_last_control;
-        t_last_control += T_CONTROL_US;
+    
+    tof_check_walls_current_cell();
+    // floodfill reads walls_current_cell
+    // floodfill outputs --> 
 
-        // Always update encoders so speed goes to zero after stopping
-        encoder_update(actual_dt_us);
 
-        // Only run motor controller while test is active
-        if (test_running) {
-            motor_pi_update(
-                TEST_OMEGA_LEFT_RAD_S,
-                TEST_OMEGA_RIGHT_RAD_S
-            );
+    
 
-            md.setM1Speed(motors.pwm_left);
-            md.setM2Speed(motors.pwm_right);
-        } else {
-            md.setM1Speed(0);
-            md.setM2Speed(0);
-        }
-    }
-
-    // ----- print data every 100 ms -----
-    if (current_time - t_last_print >= T_PRINT_US) {
-        t_last_print += T_PRINT_US;
-
-        float time_s = (current_time - t_start) / 1000000.0f;
-
-        Serial.print(time_s, 3);
-        Serial.print(",");
-
-        Serial.print(TEST_OMEGA_LEFT_RAD_S, 3);
-        Serial.print(",");
-        Serial.print(encoders.omega_left_rad_s, 3);
-        Serial.print(",");
-
-        Serial.print(TEST_OMEGA_RIGHT_RAD_S, 3);
-        Serial.print(",");
-        Serial.print(encoders.omega_right_rad_s, 3);
-        Serial.print(",");
-
-        Serial.print(motors.pwm_left);
-        Serial.print(",");
-        Serial.println(motors.pwm_right);
-    }
 }
