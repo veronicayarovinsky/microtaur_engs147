@@ -15,7 +15,7 @@
 #define I2C_TOF         Wire1
 #define S               SerialUSB
 #define DEBUG_MODE      0       // change to 1 to enable debugging outputs
-
+#define CALIBRATE_OFFSET    0
 
 // sensor objects
 // -1 passed into XSHUT arg of sensor object constructor --> disables XSHUT functionality
@@ -33,6 +33,8 @@ static VL53L4CD* const sensors[NUM_TOF_SENSORS] = {
 static const uint8_t channels[NUM_TOF_SENSORS] = {
     TOF_CH_LEFT, TOF_CH_DIAG_L, TOF_CH_FRONT, TOF_CH_DIAG_R, TOF_CH_RIGHT
 };
+
+static const int16_t tof_offsets[NUM_TOF_SENSORS] = {-13, -21, -25, -26, -25};
  
 // Pointer to the Micromouse::tof field each sensor writes to
 static int16_t* dist_field[NUM_TOF_SENSORS];
@@ -64,22 +66,26 @@ static void mux_disable() {
     I2C_TOF.endTransmission();
 }
 
-static void init_one_sensor(VL53L4CD* sensor, uint8_t channel) {
+static void init_one_sensor(VL53L4CD* sensor, uint8_t channel, uint16_t offset) {
     mux_select(channel);
     #if DEBUG_MODE == 1
         I2C_TOF.beginTransmission(0x29);
         uint8_t sensor_err = I2C_TOF.endTransmission();
         S.print("sensor 0x29 probe err="); S.println(sensor_err);  // 0 = sensor present
     #endif
-    // sensor->begin();
-    // sensor->VL53L4CD_Off();
-    // sensor->InitSensor();
-    uint8_t status = sensor->InitSensor();   // boots over I2C
-    if (status != 0) {
-        S.print("InitSensor failed, channel "); S.println(channel);
-        return;
-    }
+
+    uint8_t status = sensor->InitSensor();
+    if (status != 0) { S.print("InitSensor failed, channel "); S.println(channel); return; }
+    
     sensor->VL53L4CD_SetRangeTiming(TOF_RANGE_TIMING_BUDGET_MS, 0);   // 10ms timing budget
+
+    #if CALIBRATE_OFFSET == 1
+        int16_t offset = 0;
+        sensor->VL53L4CD_CalibrateOffset(100, &offset, 20);   // target flat at 100mm
+        S.print("ch "); S.print(channel); S.print(" offset="); S.println(offset);
+    #else
+        sensor->VL53L4CD_SetOffset(offset);
+    #endif
     sensor->VL53L4CD_StartRanging();          // continuous mode
 }
 
@@ -97,7 +103,7 @@ void tof_init() {
     for (int i = 0; i < TOF_COUNT; i++) {
         s_fresh[i] = false;
         delay(50);
-        init_one_sensor(sensors[i], channels[i]);
+        init_one_sensor(sensors[i], channels[i], tof_offsets[i]);
         delay(50);
     }
     s_next = TOF_LEFT;
