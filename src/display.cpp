@@ -75,3 +75,19 @@ void display_print() {
     oled.println("win!");
     oled.display();
 }
+
+void display_direction(const char* dir)
+{
+    oled.clearDisplay();
+    oled.setTextSize(1);
+    oled.setCursor(0,0);
+
+    display_tof_dist();
+    display_walls_current_cell();
+    display_walls_next_cell();
+
+    oled.print("Move: ");
+    oled.println(dir);
+
+    oled.display();
+}

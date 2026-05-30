@@ -33,6 +33,14 @@ static int neighbor_y(int y, Direction dir) {
     return y;
 }
 
+static Direction left_of(Direction dir) {
+    return (Direction)((dir + 3) % 4);
+}
+
+static Direction right_of(Direction dir) {
+    return (Direction)((dir + 1) % 4);
+}
+
 void maze_set_wall(int x, int y, Direction dir, bool exists) {
     if (!in_bounds(x, y)) return;
 
@@ -57,6 +65,25 @@ void maze_set_wall(int x, int y, Direction dir, bool exists) {
     }
 }
 
+static void update_walls_from_tof(
+    int x,
+    int y,
+    Direction heading,
+    const Micromouse::WallsCurrentCell& walls
+) {
+    if (walls.front != -1) {
+        maze_set_wall(x, y, heading, walls.front == 1);
+    }
+
+    if (walls.left != -1) {
+        maze_set_wall(x, y, left_of(heading), walls.left == 1);
+    }
+
+    if (walls.right != -1) {
+        maze_set_wall(x, y, right_of(heading), walls.right == 1);
+    }
+}
+
 void flood_init() {
     for (int x = 0; x < MAZE_SIZE; x++) {
         for (int y = 0; y < MAZE_SIZE; y++) {
@@ -69,7 +96,6 @@ void flood_init() {
         }
     }
 
-    // outside maze borders
     for (int i = 0; i < MAZE_SIZE; i++) {
         wall_south[i][0] = true;
         wall_north[i][MAZE_SIZE - 1] = true;
@@ -79,14 +105,12 @@ void flood_init() {
 }
 
 void flood_fill() {
-    // reset all flood values
     for (int x = 0; x < MAZE_SIZE; x++) {
         for (int y = 0; y < MAZE_SIZE; y++) {
             flood[x][y] = 255;
         }
     }
 
-    // goal is center 4 cells
     int goal_x[4] = {7, 7, 8, 8};
     int goal_y[4] = {7, 8, 7, 8};
 
@@ -156,4 +180,27 @@ Direction flood_get_best_direction(int x, int y) {
     }
 
     return best_dir;
+}
+
+FloodOutput flood_fill_step(
+    int x,
+    int y,
+    int a_global,
+    const Micromouse::WallsCurrentCell& walls
+) {
+    Direction heading = (Direction)a_global;
+
+    update_walls_from_tof(x, y, heading, walls);
+
+    flood_fill();
+
+    Direction best_dir = flood_get_best_direction(x, y);
+
+    FloodOutput output;
+    output.want_dir = best_dir;
+    output.x_want = neighbor_x(x, best_dir);
+    output.y_want = neighbor_y(y, best_dir);
+    output.a_want = (int)best_dir;
+
+    return output;
 }

@@ -13,5 +13,6 @@
 void display_init();
 void display_update();
 void display_print();
+void display_direction(const char* dir);
 
 #endif
