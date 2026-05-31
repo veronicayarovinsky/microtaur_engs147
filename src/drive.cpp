@@ -69,7 +69,7 @@ bool drive_turn(float delta_heading_rad) {
         if (!imu.ready) return false;
         s_turn_active = true;
         s_fwd_active  = false;
-        s_turn_target = imu.heading_rad + delta_heading_rad;
+        s_turn_target = imu.heading_rad + delta_heading_rad; // change this to include centerline error
         while (s_turn_target >  PI) s_turn_target -= 2.0f * PI;
         while (s_turn_target < -PI) s_turn_target += 2.0f * PI;
     }

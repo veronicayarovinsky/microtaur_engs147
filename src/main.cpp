@@ -109,12 +109,14 @@ void loop() {
     else if (state == State::TURNING) {
         // multiply change in direction (in integer form) by 90 degrees in radians
         if (drive_turn(delta_turn * (PI / 2.0f))) {
-            pose.a = (int)desired_direction; // subtract because the directions go from 0 to 3 clockwise
+            pose.a = (int)desired_direction;
             state = State::DRIVING_FORWARD;
         }
     }
 
     else if (state == State::DRIVING_FORWARD) {
+        // front, left, and right sensors check distance from side walls to see how how far bot is from centerline
+        tof_check_walls_current_cell();
         
         if (drive_forward(180.0f, 200.0f)) {
             
