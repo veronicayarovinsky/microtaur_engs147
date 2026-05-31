@@ -9,7 +9,7 @@
 #include <Arduino.h>
 
 /* HARDCODE THESE BEFORE SOLVING MAZE*/
-constexpr int X_START = 0;
+constexpr int X_START = 15;
 constexpr int Y_START = 0;
 constexpr int A_START = 0;
 

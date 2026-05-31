@@ -42,7 +42,33 @@ static const char* dir_name(Direction dir) {
 
 void setup() {
     S.begin(BAUD_RATE);
-    delay(200);
+    delay(1000);
+    S.println("--- SETUP START ---");
+    delay(1000);
+    S.println("1");
+    delay(1000);
+    S.println("2");
+    delay(1000);
+    S.println("3");
+    delay(1000);
+    S.println("4");
+    delay(1000);
+    S.println("5");
+    delay(1000);
+    S.println("6");
+    delay(1000);
+    S.println("7");
+    delay(1000);
+    S.println("8");
+    delay(1000);
+    S.println("9");
+    delay(1000);
+    S.println("10");
+    delay(1000);
+    S.println("11");
+    delay(1000);
+    S.println("12");
+
 
     pinMode(PIN_BUTTON, INPUT_PULLUP);
 
@@ -83,7 +109,11 @@ void loop() {
             t_last_tof += T_TOF_US;
 
             encoder_update(DT_TOF);
+            // S.println("Reading ToF...");
             tof_service();
+            // S.println("ToF Read OK!");
+
+    running = true;
 
             running = true;
             t_last_tof = now;
@@ -92,27 +122,45 @@ void loop() {
 
         if (now - t_last_display >= T_DISPLAY_US) {
             t_last_display += T_DISPLAY_US;
-
+            //S.println("sensing current cell (1)...");
             tof_check_walls_current_cell();
+            //S.println("sensing next cell (1)...");
             tof_check_walls_next_cell();
 
             display_update();
         }
 
-        bool button_state = digitalRead(PIN_BUTTON);
+        // bool button_state = digitalRead(PIN_BUTTON);
 
-        if (last_button_state == HIGH && button_state == LOW) {
+
+        // if (last_button_state == HIGH && button_state == LOW) {
+        if (S.available() > 0) {
+            
+            char incomingKey = S.read();
+            while (S.available() > 0) {
+                S.read();
+            }
+           
             delay(50);
+            
 
+            S.print("Button Pressed. Current Pose: (");
+            S.print(pose.x); S.print(", "); S.print(pose.y);
+            S.print(") Facing: "); S.println(dir_name((Direction)pose.a));
+
+            //S.println("sensing current cell (2)...");
             tof_check_walls_current_cell();
+            //S.println("sensing next cell (2)...");
             tof_check_walls_next_cell();
 
+            //S.println("Running flood fill calculation...");
             FloodOutput next_move = flood_fill_step(
                 pose.x,
                 pose.y,
                 pose.a,
                 walls_current_cell
             );
+            //S.println("Flood fill complete!");
 
             display_direction(dir_name(next_move.want_dir));
 
@@ -135,6 +183,6 @@ void loop() {
             pose.a = next_move.a_want;
         }
 
-        last_button_state = button_state;
+        // last_button_state = button_state;
     }
 }
