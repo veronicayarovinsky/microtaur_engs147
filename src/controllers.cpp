@@ -12,6 +12,12 @@ extern ArduinoMotorShieldR3 md;
 // outer position loop
 constexpr float FWD_KP = 2.0f;    // (m/s) / m = s⁻¹
 constexpr float FWD_KD = 1.1f;
+/*constexpr float FWD_V1 = 0.0008868f;    
+constexpr float FWD_E = 0.069009f
+constexpr float FWD_E1 = 0.063067f
+/* #define V1 0.0008868
+#define E 0.069009
+#define E1 0.063067 */ // difference equation variables... input in mm
 
 // outer angle loop
 constexpr float ROT_KP = 2.1f;    // (rad/s) / rad = s⁻¹
@@ -20,7 +26,14 @@ constexpr float ROT_KD = 1.2f;
 // inner motor speed loop
 constexpr float SPEED_KP         = 1.0f;   // PWM / (rad/s)
 constexpr float SPEED_KI         = 5.0f;   // PWM / (rad/s × s)
-constexpr float MOTOR_INTEGRAL_MAX = 200.0f;
+constexpr float MOTOR_INTEGRAL_MAX = 200.0f; //probably 33 for these motors, just didnt wanna change code i ddint write
+/*constexpr float SPEED_V1 = 1.0f;    
+constexpr float SPEED_E = 0.68337f
+constexpr float SPEED_E1 = 0.5167f
+/*#define V1 1
+#define E 0.68337
+#define E1 0.5167*/ //dif eqn variables for speed in rad/s (* input by radius(15mm) to get in speed) or more like divide speed by radius to be able to use
+
 
 constexpr float MOTOR_MAX_PWM = 400;
 // --------------------------
@@ -56,6 +69,7 @@ static float position_controller(float velocity) {
     s_fwd_error      = s_fwd_error + (velocity * DT_CONTROL) - encoders.fwd_change_mm;
     s_prev_fwd_error = s_fwd_error;
 
+    // if output is V as I think it is, V=(V1*s_fwd_error)+(E*s_fwd_error)-(E1*s_prev_fwd_error)
     return FWD_KP * s_fwd_error + FWD_KD * (s_fwd_error - s_prev_fwd_error);
 }
 
