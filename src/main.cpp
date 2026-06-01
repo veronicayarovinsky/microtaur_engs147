@@ -25,14 +25,22 @@ ArduinoMotorShieldR3 md;
 #define DISPLAY_TS      250000UL            // update display every 250ms
 #define SETUP_DELAY_MS  200
 #define S SerialUSB
+#define DT_TOF DT_CONTROL
 
 // static unsigned long t_start = 0;
 static unsigned long t_last_display   = 0;
+static unsigned long t_last_tof     = 0;
 // how much the robot needs to turn relatively
 static int delta_turn = 0;
 static Direction desired_direction = NORTH;
 
-
+static const char* dir_name(Direction dir) {
+    if (dir == NORTH) return "NORTH";
+    if (dir == EAST)  return "EAST";
+    if (dir == SOUTH) return "SOUTH";
+    if (dir == WEST)  return "WEST";
+    return "?";
+}
 
 void setup() {
     S.begin(BAUD_RATE);
@@ -61,11 +69,28 @@ void setup() {
 
 void loop() {
     using namespace Micromouse;
+    unsigned long now = micros();
+
+    // continuous sensor polling
+    if (now - t_last_tof >= T_TOF_US) {
+        t_last_tof = now;
+        
+        encoder_update(DT_TOF);
+        tof_service(); 
+    }
 
     // Init State
 
     if (state == State::INIT) {
-        // not sure what else to put here but I'm assuming the init state is important for something
+        delay(1000);
+        S.println("--- SETUP START ---");
+        delay(1000);
+        S.println("1");
+        delay(1000);
+        S.println("2");
+        delay(1000);
+        S.println("3");
+        delay(1000);
         state = State::AT_CELL; // Jump straight into your maze tracking loop
     }
 
@@ -73,27 +98,39 @@ void loop() {
         // win check: am I in the center 4 cells of the maze?
         if (pose.x >= 7 && pose.x <= 8 && pose.y >= 7 && pose.y <= 8) {
            state = State::GOAL;
-            return;
         }
-
+        else {
             // front, left, and right sensors check if there's a wall there
             tof_check_walls_current_cell();
+            // S.print("left wall:"); S.println(tof.dist_left_mm);
+            // S.print("right wall:"); S.println(tof.dist_right_mm);
+            // S.print("front wall:"); S.println(tof.dist_front_mm);
 
-            // translate the relative directions of the sensors to global NESW
-            Direction global_front = (Direction)((pose.a) % 4);
-            Direction global_right = (Direction)((pose.a + 1) % 4);
-            Direction global_left  = (Direction)((pose.a + 3) % 4);
+            // flood fill logic
+            FloodOutput next_move = flood_fill_step(
+                pose.x,
+                pose.y,
+                pose.a,
+                walls_current_cell
+            );
 
-            // true if there's a wall, false if there's no wall
-            maze_set_wall(pose.x, pose.y, global_front, walls_current_cell.front);
-            maze_set_wall(pose.x, pose.y, global_right, walls_current_cell.right);
-            maze_set_wall(pose.x, pose.y, global_left,  walls_current_cell.left);
+            // display_direction(dir_name(next_move.want_dir));
 
-            // floodfill reads walls_current_cell and current position
-            flood_fill();
+            // S.print("Current cell: ");
+            // S.print(pose.x);
+            // S.print(", ");
+            // S.println(pose.y);
+
+            // S.print("Move direction: ");
+            // S.println(dir_name(next_move.want_dir));
+
+            // S.print("Next cell: ");
+            // S.print(next_move.x_want);
+            // S.print(", ");
+            // S.println(next_move.y_want);
 
             // floodfill outputs which cell it wants to move to 
-            desired_direction = flood_get_best_direction(pose.x, pose.y);
+            desired_direction = next_move.want_dir;
 
             // calculate how much you have to turn represented as an integer
             delta_turn = pose.a - desired_direction;
@@ -103,6 +140,7 @@ void loop() {
             if (delta_turn < -2) delta_turn += 4;
 
             state = State::TURNING;
+        }
 
     }
 

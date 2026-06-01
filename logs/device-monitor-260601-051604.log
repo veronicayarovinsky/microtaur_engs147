@@ -1,0 +1,29 @@
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+1768843636
+1819239275
+starting
+press button to calculate next flood fill direction
+Button Pressed. Current Pose: (15, 0) Facing: NORTH
+left wall:46
+right wall:20
+front wall:56
+Current cell: 15, 0
+Move direction: NORTH
+Next cell: 15, 1
+Button Pressed. Current Pose: (15, 1) Facing: NORTH
+left wall:51
+right wall:390
+front wall:203
+Current cell: 15, 1
+Move direction: NORTH
+Next cell: 15, 2

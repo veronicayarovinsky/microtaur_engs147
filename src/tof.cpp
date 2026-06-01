@@ -91,9 +91,11 @@ static void init_one_sensor(VL53L4CD* sensor, uint8_t channel, uint16_t offset) 
 
 
 void tof_init() {
+    S.println('TOF init');
     using namespace Micromouse;
     I2C_TOF.begin();
     I2C_TOF.setClock(400000);      // 400 kHz
+    S.println('TOF setClock');
     dist_field[TOF_LEFT]   = &tof.dist_left_mm;
     dist_field[TOF_DIAG_L] = &tof.dist_diag_left_mm;
     dist_field[TOF_FRONT]  = &tof.dist_front_mm;

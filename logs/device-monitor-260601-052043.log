@@ -1,0 +1,435 @@
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+1768843636
+1819239275
+starting
+press button to calculate next flood fill direction
+Button Pressed. Current Pose: (15, 0) Facing: NORTH
+left wall:35
+right wall:28
+front wall:201
+Current cell: 15, 0
+Move direction: NORTH
+Next cell: 15, 1
+Button Pressed. Current Pose: (15, 1) Facing: NORTH
+left wall:395
+right wall:37
+front wall:27
+Current cell: 15, 1
+Move direction: WEST
+Next cell: 14, 1
+Button Pressed. Current Pose: (14, 1) Facing: WEST
+left wall:239
+right wall:203
+front wall:238
+Current cell: 14, 1
+Move direction: WEST
+Next cell: 13, 1
+Button Pressed. Current Pose: (13, 1) Facing: WEST
+left wall:55
+right wall:195
+front wall:64
+Current cell: 13, 1
+Move direction: NORTH
+Next cell: 13, 2
+Button Pressed. Current Pose: (13, 2) Facing: NORTH
+left wall:224
+right wall:24
+front wall:40
+Current cell: 13, 2
+Move direction: WEST
+Next cell: 12, 2
+Button Pressed. Current Pose: (12, 2) Facing: WEST
+left wall:49
+right wall:204
+front wall:55
+Current cell: 12, 2
+Move direction: NORTH
+Next cell: 12, 3
+Button Pressed. Current Pose: (12, 3) Facing: NORTH
+left wall:234
+right wall:25
+front wall:50
+Current cell: 12, 3
+Move direction: WEST
+Next cell: 11, 3
+Button Pressed. Current Pose: (11, 3) Facing: WEST
+left wall:61
+right wall:344
+front wall:59
+Current cell: 11, 3
+Move direction: NORTH
+Next cell: 11, 4
+Button Pressed. Current Pose: (11, 4) Facing: NORTH
+left wall:227
+right wall:23
+front wall:212
+Current cell: 11, 4
+Move direction: NORTH
+Next cell: 11, 5
+Button Pressed. Current Pose: (11, 5) Facing: NORTH
+left wall:41
+right wall:218
+front wall:42
+Current cell: 11, 5
+Move direction: EAST
+Next cell: 12, 5
+Button Pressed. Current Pose: (12, 5) Facing: EAST
+left wall:30
+right wall:229
+front wall:64
+Current cell: 12, 5
+Move direction: WEST
+Next cell: 11, 5
+Button Pressed. Current Pose: (11, 5) Facing: WEST
+left wall:394
+right wall:33
+front wall:42
+Current cell: 11, 5
+Move direction: SOUTH
+Next cell: 11, 4
+Button Pressed. Current Pose: (11, 4) Facing: SOUTH
+left wall:31
+right wall:224
+front wall:237
+Current cell: 11, 4
+Move direction: WEST
+Next cell: 10, 4
+Button Pressed. Current Pose: (10, 4) Facing: WEST
+left wall:41
+right wall:26
+front wall:58
+Current cell: 10, 4
+Move direction: EAST
+Next cell: 11, 4
+Button Pressed. Current Pose: (11, 4) Facing: EAST
+left wall:206
+right wall:234
+front wall:32
+Current cell: 11, 4
+Move direction: NORTH
+Next cell: 11, 5
+Button Pressed. Current Pose: (11, 5) Facing: NORTH
+left wall:48
+right wall:208
+front wall:44
+Current cell: 11, 5
+Move direction: EAST
+Next cell: 12, 5
+Button Pressed. Current Pose: (12, 5) Facing: EAST
+left wall:34
+right wall:223
+front wall:45
+Current cell: 12, 5
+Move direction: SOUTH
+Next cell: 12, 4
+Button Pressed. Current Pose: (12, 4) Facing: SOUTH
+left wall:213
+right wall:30
+front wall:39
+Current cell: 12, 4
+Move direction: EAST
+Next cell: 13, 4
+Button Pressed. Current Pose: (13, 4) Facing: EAST
+left wall:219
+right wall:222
+front wall:48
+Current cell: 13, 4
+Move direction: NORTH
+Next cell: 13, 5
+Button Pressed. Current Pose: (13, 5) Facing: NORTH
+left wall:39
+right wall:38
+front wall:34
+Current cell: 13, 5
+Move direction: SOUTH
+Next cell: 13, 4
+Button Pressed. Current Pose: (13, 4) Facing: SOUTH
+left wall:50
+right wall:199
+front wall:212
+Current cell: 13, 4
+Move direction: SOUTH
+Next cell: 13, 3
+Button Pressed. Current Pose: (13, 3) Facing: SOUTH
+left wall:214
+right wall:38
+front wall:30
+Current cell: 13, 3
+Move direction: EAST
+Next cell: 14, 3
+Button Pressed. Current Pose: (14, 3) Facing: EAST
+left wall:205
+right wall:44
+front wall:41
+Current cell: 14, 3
+Move direction: NORTH
+Next cell: 14, 4
+Button Pressed. Current Pose: (14, 4) Facing: NORTH
+left wall:36
+right wall:213
+front wall:44
+Current cell: 14, 4
+Move direction: EAST
+Next cell: 15, 4
+Button Pressed. Current Pose: (15, 4) Facing: EAST
+left wall:231
+right wall:18
+front wall:49
+Current cell: 15, 4
+Move direction: NORTH
+Next cell: 15, 5
+Button Pressed. Current Pose: (15, 5) Facing: NORTH
+left wall:235
+right wall:20
+front wall:46
+Current cell: 15, 5
+Move direction: WEST
+Next cell: 14, 5
+Button Pressed. Current Pose: (14, 5) Facing: WEST
+left wall:42
+right wall:212
+front wall:55
+Current cell: 14, 5
+Move direction: NORTH
+Next cell: 14, 6
+Button Pressed. Current Pose: (14, 6) Facing: NORTH
+left wall:389
+right wall:37
+front wall:50
+Current cell: 14, 6
+Move direction: WEST
+Next cell: 13, 6
+Button Pressed. Current Pose: (13, 6) Facing: WEST
+left wall:58
+right wall:192
+front wall:219
+Current cell: 13, 6
+Move direction: WEST
+Next cell: 12, 6
+Button Pressed. Current Pose: (12, 6) Facing: WEST
+left wall:56
+right wall:205
+front wall:41
+Current cell: 12, 6
+Move direction: NORTH
+Next cell: 12, 7
+Button Pressed. Current Pose: (12, 7) Facing: NORTH
+left wall:36
+right wall:34
+front wall:62
+Current cell: 12, 7
+Move direction: SOUTH
+Next cell: 12, 6
+Button Pressed. Current Pose: (12, 6) Facing: SOUTH
+left wall:323
+right wall:19
+front wall:42
+Current cell: 12, 6
+Move direction: EAST
+Next cell: 13, 6
+Button Pressed. Current Pose: (13, 6) Facing: EAST
+left wall:211
+right wall:36
+front wall:231
+Current cell: 13, 6
+Move direction: NORTH
+Next cell: 13, 7
+Button Pressed. Current Pose: (13, 7) Facing: NORTH
+left wall:50
+right wall:381
+front wall:37
+Current cell: 13, 7
+Move direction: EAST
+Next cell: 14, 7
+Button Pressed. Current Pose: (14, 7) Facing: EAST
+left wall:217
+right wall:34
+front wall:227
+Current cell: 14, 7
+Move direction: NORTH
+Next cell: 14, 8
+Button Pressed. Current Pose: (14, 8) Facing: NORTH
+left wall:35
+right wall:217
+front wall:42
+Current cell: 14, 8
+Move direction: EAST
+Next cell: 15, 8
+Button Pressed. Current Pose: (15, 8) Facing: EAST
+left wall:222
+right wall:32
+front wall:41
+Current cell: 15, 8
+Move direction: NORTH
+Next cell: 15, 9
+Button Pressed. Current Pose: (15, 9) Facing: NORTH
+left wall:219
+right wall:24
+front wall:52
+Current cell: 15, 9
+Move direction: WEST
+Next cell: 14, 9
+Button Pressed. Current Pose: (14, 9) Facing: WEST
+left wall:47
+right wall:219
+front wall:51
+Current cell: 14, 9
+Move direction: NORTH
+Next cell: 14, 10
+Button Pressed. Current Pose: (14, 10) Facing: NORTH
+left wall:36
+right wall:211
+front wall:37
+Current cell: 14, 10
+Move direction: EAST
+Next cell: 15, 10
+Button Pressed. Current Pose: (15, 10) Facing: EAST
+left wall:715
+right wall:36
+front wall:43
+Current cell: 15, 10
+Move direction: NORTH
+Next cell: 15, 11
+Button Pressed. Current Pose: (15, 11) Facing: NORTH
+left wall:34
+right wall:38
+front wall:786
+Current cell: 15, 11
+Move direction: NORTH
+Next cell: 15, 12
+Button Pressed. Current Pose: (15, 12) Facing: NORTH
+left wall:43
+right wall:32
+front wall:604
+Current cell: 15, 12
+Move direction: NORTH
+Next cell: 15, 13
+Button Pressed. Current Pose: (15, 13) Facing: NORTH
+left wall:391
+right wall:32
+front wall:406
+Current cell: 15, 13
+Move direction: WEST
+Next cell: 14, 13
+Button Pressed. Current Pose: (14, 13) Facing: WEST
+left wall:43
+right wall:26
+front wall:242
+Current cell: 14, 13
+Move direction: WEST
+Next cell: 13, 13
+Button Pressed. Current Pose: (13, 13) Facing: WEST
+left wall:208
+right wall:37
+front wall:35
+Current cell: 13, 13
+Move direction: SOUTH
+Next cell: 13, 12
+Button Pressed. Current Pose: (13, 12) Facing: SOUTH
+left wall:231
+right wall:24
+front wall:38
+Current cell: 13, 12
+Move direction: EAST
+Next cell: 14, 12
+Button Pressed. Current Pose: (14, 12) Facing: EAST
+left wall:48
+right wall:218
+front wall:60
+Current cell: 14, 12
+Move direction: SOUTH
+Next cell: 14, 11
+Button Pressed. Current Pose: (14, 11) Facing: SOUTH
+left wall:42
+right wall:209
+front wall:41
+Current cell: 14, 11
+Move direction: WEST
+Next cell: 13, 11
+Button Pressed. Current Pose: (13, 11) Facing: WEST
+left wall:550
+right wall:33
+front wall:47
+Current cell: 13, 11
+Move direction: SOUTH
+Next cell: 13, 10
+Button Pressed. Current Pose: (13, 10) Facing: SOUTH
+left wall:44
+right wall:21
+front wall:413
+Current cell: 13, 10
+Move direction: SOUTH
+Next cell: 13, 9
+Button Pressed. Current Pose: (13, 9) Facing: SOUTH
+left wall:41
+right wall:29
+front wall:221
+Current cell: 13, 9
+Move direction: SOUTH
+Next cell: 13, 8
+Button Pressed. Current Pose: (13, 8) Facing: SOUTH
+left wall:44
+right wall:389
+front wall:33
+Current cell: 13, 8
+Move direction: WEST
+Next cell: 12, 8
+Button Pressed. Current Pose: (12, 8) Facing: WEST
+left wall:48
+right wall:209
+front wall:232
+Current cell: 12, 8
+Move direction: WEST
+Next cell: 11, 8
+Button Pressed. Current Pose: (11, 8) Facing: WEST
+left wall:226
+right wall:25
+front wall:46
+Current cell: 11, 8
+Move direction: SOUTH
+Next cell: 11, 7
+Button Pressed. Current Pose: (11, 7) Facing: SOUTH
+left wall:49
+right wall:214
+front wall:50
+Current cell: 11, 7
+Move direction: WEST
+Next cell: 10, 7
+Button Pressed. Current Pose: (10, 7) Facing: WEST
+left wall:221
+right wall:31
+front wall:50
+Current cell: 10, 7
+Move direction: SOUTH
+Next cell: 10, 6
+Button Pressed. Current Pose: (10, 6) Facing: SOUTH
+left wall:223
+right wall:381
+front wall:42
+Current cell: 10, 6
+Move direction: WEST
+Next cell: 9, 6
+Button Pressed. Current Pose: (9, 6) Facing: WEST
+left wall:34
+right wall:387
+front wall:224
+Current cell: 9, 6
+Move direction: WEST
+Next cell: 8, 6
+Button Pressed. Current Pose: (8, 6) Facing: WEST
+left wall:229
+right wall:375
+front wall:50
+Current cell: 8, 6
+Move direction: NORTH
+Next cell: 8, 7
