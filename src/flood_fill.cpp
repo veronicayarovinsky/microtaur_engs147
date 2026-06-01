@@ -29,6 +29,8 @@ static Direction right_of(Direction dir) {
     return (Direction)((dir + 1) % 4);
 }
 
+// GLOBAL maze direction movement.
+// NORTH/SOUTH/EAST/WEST are fixed to the maze, not the robot.
 static int neighbor_x(int x, Direction dir) {
     if (dir == EAST) return x + 1;
     if (dir == WEST) return x - 1;
@@ -76,33 +78,42 @@ void maze_set_wall(int x, int y, Direction dir, bool exists) {
     }
 }
 
+// Converts ROBOT-relative sensor readings into GLOBAL maze walls.
 static void update_walls_from_tof(
     int x,
     int y,
-    Direction heading,
+    Direction robot_heading,
     const Micromouse::WallsCurrentCell& walls
 ) {
     if (walls.front != -1) {
-        maze_set_wall(x, y, heading, walls.front == 1);
+        maze_set_wall(x, y, robot_heading, walls.front == 1);
     }
 
     if (walls.left != -1) {
-        maze_set_wall(x, y, left_of(heading), walls.left == 1);
+        maze_set_wall(x, y, left_of(robot_heading), walls.left == 1);
     }
 
     if (walls.right != -1) {
-        maze_set_wall(x, y, right_of(heading), walls.right == 1);
+        maze_set_wall(x, y, right_of(robot_heading), walls.right == 1);
     }
 }
 
+// Manhattan distance to nearest center cell.
 static void init_manhattan_distances() {
     for (int x = 0; x < MAZE_SIZE; x++) {
         for (int y = 0; y < MAZE_SIZE; y++) {
             if (is_goal(x, y)) {
                 flood[x][y] = 0;
             } else {
-                int dx = abs(x - 7);
-                int dy = abs(y - 7);
+                int dx = 0;
+                int dy = 0;
+
+                if (x < 7) dx = 7 - x;
+                else if (x > 8) dx = x - 8;
+
+                if (y < 7) dy = 7 - y;
+                else if (y > 8) dy = y - 8;
+
                 flood[x][y] = dx + dy;
             }
         }
@@ -111,6 +122,7 @@ static void init_manhattan_distances() {
 
 void flood_init() {
     Serial.println("FLOOD_INIT CALLED");
+
     for (int x = 0; x < MAZE_SIZE; x++) {
         for (int y = 0; y < MAZE_SIZE; y++) {
             wall_north[x][y] = false;
@@ -118,13 +130,9 @@ void flood_init() {
             wall_south[x][y] = false;
             wall_west[x][y] = false;
         }
-    Serial.print("East wall at (15,15): ");
-    Serial.println(wall_east[15][15]);
-
-    Serial.print("South wall at (15,15): ");
-    Serial.println(wall_south[15][15]);
     }
 
+    // Boundary walls.
     for (int i = 0; i < MAZE_SIZE; i++) {
         wall_north[i][0] = true;
         wall_south[i][MAZE_SIZE - 1] = true;
@@ -133,6 +141,15 @@ void flood_init() {
     }
 
     init_manhattan_distances();
+
+    Serial.print("MAZE_SIZE = ");
+    Serial.println(MAZE_SIZE);
+
+    Serial.print("East wall at (15,15): ");
+    Serial.println(wall_east[15][15]);
+
+    Serial.print("South wall at (15,15): ");
+    Serial.println(wall_south[15][15]);
 }
 
 void flood_fill() {
@@ -145,7 +162,6 @@ void flood_fill() {
 
         for (int x = 0; x < MAZE_SIZE; x++) {
             for (int y = 0; y < MAZE_SIZE; y++) {
-
                 if (is_goal(x, y)) {
                     flood[x][y] = 0;
                     continue;
@@ -168,6 +184,8 @@ void flood_fill() {
                     }
                 }
 
+                if (min_neighbor == 255) continue;
+
                 int new_value = min_neighbor + 1;
 
                 if (new_value != flood[x][y]) {
@@ -179,16 +197,17 @@ void flood_fill() {
     }
 }
 
-Direction flood_get_best_direction(int x, int y, Direction heading) {
-    Direction best_dir = heading;
-    int best_value = flood[x][y];
-
+Direction flood_get_best_direction(int x, int y, Direction robot_heading) {
     Direction check_order[4] = {
-        heading,
-        left_of(heading),
-        right_of(heading),
-        opposite(heading)
+        robot_heading,
+        left_of(robot_heading),
+        right_of(robot_heading),
+        opposite(robot_heading)
     };
+
+    Direction best_dir = robot_heading;
+    int best_value = 999;
+    bool found_valid_move = false;
 
     for (int i = 0; i < 4; i++) {
         Direction dir = check_order[i];
@@ -200,10 +219,15 @@ Direction flood_get_best_direction(int x, int y, Direction heading) {
 
         if (!in_bounds(nx, ny)) continue;
 
-        if (flood[nx][ny] < best_value) {
+        if (!found_valid_move || flood[nx][ny] < best_value) {
             best_value = flood[nx][ny];
             best_dir = dir;
+            found_valid_move = true;
         }
+    }
+
+    if (!found_valid_move) {
+        return opposite(robot_heading);
     }
 
     return best_dir;
@@ -215,35 +239,44 @@ FloodOutput flood_fill_step(
     int a_global,
     const Micromouse::WallsCurrentCell& walls
 ) {
-    Direction heading = (Direction)a_global;
+    Direction robot_heading = (Direction)a_global;
 
-    update_walls_from_tof(x, y, heading, walls);
+    Serial.print("Flood step cell: ");
+    Serial.print(x);
+    Serial.print(",");
+    Serial.print(y);
+    Serial.print(" heading: ");
+    Serial.println((int)robot_heading);
+
+    update_walls_from_tof(x, y, robot_heading, walls);
+
+    Serial.print("N wall: ");
+    Serial.println(has_wall(x, y, NORTH));
+    Serial.print("E wall: ");
+    Serial.println(has_wall(x, y, EAST));
+    Serial.print("S wall: ");
+    Serial.println(has_wall(x, y, SOUTH));
+    Serial.print("W wall: ");
+    Serial.println(has_wall(x, y, WEST));
 
     flood_fill();
 
-    Direction best_dir = flood_get_best_direction(x, y, heading);
+    Direction best_dir = flood_get_best_direction(x, y, robot_heading);
 
-    Serial.print("Current cell: ");
-    Serial.print(x);
-    Serial.print(",");
-    Serial.println(y);
+    int next_x = neighbor_x(x, best_dir);
+    int next_y = neighbor_y(y, best_dir);
 
-    Serial.print("North wall: ");
-    Serial.println(has_wall(x, y, NORTH));
-
-    Serial.print("East wall: ");
-    Serial.println(has_wall(x, y, EAST));
-
-    Serial.print("South wall: ");
-    Serial.println(has_wall(x, y, SOUTH));
-
-    Serial.print("West wall: ");
-    Serial.println(has_wall(x, y, WEST));
+    if (!in_bounds(next_x, next_y) || has_wall(x, y, best_dir)) {
+        Serial.println("ERROR: flood wanted invalid move. Staying in place.");
+        best_dir = robot_heading;
+        next_x = x;
+        next_y = y;
+    }
 
     FloodOutput output;
     output.want_dir = best_dir;
-    output.x_want = neighbor_x(x, best_dir);
-    output.y_want = neighbor_y(y, best_dir);
+    output.x_want = next_x;
+    output.y_want = next_y;
     output.a_want = (int)best_dir;
 
     return output;
