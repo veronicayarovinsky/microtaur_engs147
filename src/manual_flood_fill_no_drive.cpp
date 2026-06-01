@@ -71,12 +71,28 @@ void setup() {
 
 
     pinMode(PIN_BUTTON, INPUT_PULLUP);
+    // pinMode(LED_BUILTIN, OUTPUT);
 
     display_init();
     md.init();
     encoder_init();
     tof_init();
     flood_init();
+
+    // S.println("Init Display...");
+    // display_init();
+
+    // S.println("Init Motors...");
+    // md.init();
+
+    // S.println("Init Encoders...");
+    // encoder_init();
+
+    // S.println("Init ToF Sensors...");
+    // tof_init();
+
+    // S.println("Init Flood...");
+    // flood_init();
 
     unsigned long now = micros();
 
@@ -92,6 +108,14 @@ void setup() {
 }
 
 void loop() {
+    
+    // static unsigned long last_blink = 0;
+    // if (millis() - last_blink >= 500) {
+    // last_blink = millis();
+    // digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN)); 
+    // // S.println("LED on");
+    // }
+
     using namespace Micromouse;
 
     unsigned long times[NUM_SAMPLES];
@@ -113,7 +137,7 @@ void loop() {
             tof_service();
             // S.println("ToF Read OK!");
 
-    running = true;
+            running = true;
 
             running = true;
             t_last_tof = now;
@@ -122,8 +146,11 @@ void loop() {
 
         if (now - t_last_display >= T_DISPLAY_US) {
             t_last_display += T_DISPLAY_US;
-            //S.println("sensing current cell (1)...");
             tof_check_walls_current_cell();
+            // S.println("sensing current cell (1)...");
+            // S.print("left wall:"); S.println(tof.dist_left_mm);
+            // S.print("right wall:"); S.println(tof.dist_right_mm);
+            // S.print("front wall:"); S.println(tof.dist_front_mm);
             //S.println("sensing next cell (1)...");
             tof_check_walls_next_cell();
 
@@ -150,6 +177,10 @@ void loop() {
 
             //S.println("sensing current cell (2)...");
             tof_check_walls_current_cell();
+            // S.println("sensing current cell (2)...");
+            S.print("left wall:"); S.println(tof.dist_left_mm);
+            S.print("right wall:"); S.println(tof.dist_right_mm);
+            S.print("front wall:"); S.println(tof.dist_front_mm);
             //S.println("sensing next cell (2)...");
             tof_check_walls_next_cell();
 

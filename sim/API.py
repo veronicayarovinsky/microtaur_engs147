@@ -114,3 +114,7 @@ def wasReset():
 
 def ackReset():
     command(args=["ackReset"], return_type=str)
+
+def log(string):
+    sys.stderr.write("{}\n".format(string))
+    sys.stderr.flush()

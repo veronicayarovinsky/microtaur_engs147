@@ -103,6 +103,9 @@ void tof_init() {
     for (int i = 0; i < TOF_COUNT; i++) {
         s_fresh[i] = false;
         delay(50);
+        // Serial.print("Attempting to init sensor on channel: ");
+        // Serial.println(channels[i]);
+
         init_one_sensor(sensors[i], channels[i], tof_offsets[i]);
         delay(50);
     }

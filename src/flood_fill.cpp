@@ -36,8 +36,8 @@ static int neighbor_x(int x, Direction dir) {
 }
 
 static int neighbor_y(int y, Direction dir) {
-    if (dir == NORTH) return y - 1;
-    if (dir == SOUTH) return y + 1;
+    if (dir == NORTH) return y + 1;
+    if (dir == SOUTH) return y - 1;
     return y;
 }
 
@@ -57,7 +57,7 @@ void maze_set_wall(int x, int y, Direction dir, bool exists) {
 
     if (dir == NORTH) {
         wall_north[x][y] = exists;
-        if (in_bounds(x, y - 1)) wall_south[x][y - 1] = exists;
+        if (in_bounds(x, y + 1)) wall_south[x][y + 1] = exists;
     }
 
     else if (dir == EAST) {
@@ -67,7 +67,7 @@ void maze_set_wall(int x, int y, Direction dir, bool exists) {
 
     else if (dir == SOUTH) {
         wall_south[x][y] = exists;
-        if (in_bounds(x, y + 1)) wall_north[x][y + 1] = exists;
+        if (in_bounds(x, y - 1)) wall_north[x][y - 1] = exists;
     }
 
     else if (dir == WEST) {
@@ -101,8 +101,8 @@ static void init_manhattan_distances() {
             if (is_goal(x, y)) {
                 flood[x][y] = 0;
             } else {
-                int dx = abs(x - 7);
-                int dy = abs(y - 7);
+                int dx = max(0, max(7 - x, x - 8));
+                int dy = max(0, max(7 - y, y - 8));
                 flood[x][y] = dx + dy;
             }
         }
@@ -120,8 +120,8 @@ void flood_init() {
     }
 
     for (int i = 0; i < MAZE_SIZE; i++) {
-        wall_north[i][0] = true;
-        wall_south[i][MAZE_SIZE - 1] = true;
+        wall_south[i][0] = true;
+        wall_north[i][MAZE_SIZE - 1] = true;
         wall_west[0][i] = true;
         wall_east[MAZE_SIZE - 1][i] = true;
     }
@@ -164,6 +164,11 @@ void flood_fill() {
 
                 int new_value = min_neighbor + 1;
 
+                if (new_value > 255) {
+                    new_value = 255;
+                    Serial.println("goal is walled off");
+                }
+
                 if (new_value != flood[x][y]) {
                     flood[x][y] = new_value;
                     changed = true;
@@ -175,7 +180,8 @@ void flood_fill() {
 
 Direction flood_get_best_direction(int x, int y, Direction heading) {
     Direction best_dir = heading;
-    int best_value = flood[x][y];
+    int best_value = 30000; // arbitrarily high number
+    bool found_valid = false;
 
     Direction check_order[4] = {
         heading,
@@ -194,9 +200,10 @@ Direction flood_get_best_direction(int x, int y, Direction heading) {
 
         if (!in_bounds(nx, ny)) continue;
 
-        if (flood[nx][ny] < best_value) {
+        if (!found_valid || flood[nx][ny] < best_value) {
             best_value = flood[nx][ny];
             best_dir = dir;
+            found_valid = true;
         }
     }
 
