@@ -110,6 +110,7 @@ static void init_manhattan_distances() {
 }
 
 void flood_init() {
+    Serial.println("FLOOD_INIT CALLED");
     for (int x = 0; x < MAZE_SIZE; x++) {
         for (int y = 0; y < MAZE_SIZE; y++) {
             wall_north[x][y] = false;
@@ -117,6 +118,11 @@ void flood_init() {
             wall_south[x][y] = false;
             wall_west[x][y] = false;
         }
+    Serial.print("East wall at (15,15): ");
+    Serial.println(wall_east[15][15]);
+
+    Serial.print("South wall at (15,15): ");
+    Serial.println(wall_south[15][15]);
     }
 
     for (int i = 0; i < MAZE_SIZE; i++) {
@@ -216,6 +222,23 @@ FloodOutput flood_fill_step(
     flood_fill();
 
     Direction best_dir = flood_get_best_direction(x, y, heading);
+
+    Serial.print("Current cell: ");
+    Serial.print(x);
+    Serial.print(",");
+    Serial.println(y);
+
+    Serial.print("North wall: ");
+    Serial.println(has_wall(x, y, NORTH));
+
+    Serial.print("East wall: ");
+    Serial.println(has_wall(x, y, EAST));
+
+    Serial.print("South wall: ");
+    Serial.println(has_wall(x, y, SOUTH));
+
+    Serial.print("West wall: ");
+    Serial.println(has_wall(x, y, WEST));
 
     FloodOutput output;
     output.want_dir = best_dir;
