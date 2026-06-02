@@ -31,6 +31,8 @@ void controllers_drive_wheel_speeds(float omega_L_ref, float omega_R_ref);
 
 void controllers_drive(float fwd_mm_s, float rot_rad_s);
 
+bool drive_turn(float target_rad);
+
 // for logging to serial
 float controllers_get_fwd_error();    // forward position error [m]
 float controllers_get_rot_error();    // rotation error [rad]

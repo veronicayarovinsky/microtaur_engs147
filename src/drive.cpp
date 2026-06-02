@@ -62,24 +62,24 @@ static bool heading_settled() {
         && fabsf(imu.omega_imu_rad_s) < OMEGA_DONE_RAD_S;
 }
 
-bool drive_turn(float delta_heading_rad) {
-    using namespace Micromouse;
+// bool drive_turn(float delta_heading_rad) {
+//     using namespace Micromouse;
 
-    if (!s_turn_active) {
-        if (!imu.ready) return false;
-        s_turn_active = true;
-        s_fwd_active  = false;
-        s_turn_target = imu.heading_rad + delta_heading_rad; // change this to include centerline error
-        while (s_turn_target >  PI) s_turn_target -= 2.0f * PI;
-        while (s_turn_target < -PI) s_turn_target += 2.0f * PI;
-    }
+//     if (!s_turn_active) {
+//         if (!imu.ready) return false;
+//         s_turn_active = true;
+//         s_fwd_active  = false;
+//         s_turn_target = imu.heading_rad + delta_heading_rad; // change this to include centerline error
+//         while (s_turn_target >  PI) s_turn_target -= 2.0f * PI;
+//         while (s_turn_target < -PI) s_turn_target += 2.0f * PI;
+//     }
 
-    drive_command.heading_ref_rad = s_turn_target;
-    drive_command.v_base_mm_s      = 0.0f;            // pure rotation
+//     drive_command.heading_ref_rad = s_turn_target;
+//     drive_command.v_base_mm_s      = 0.0f;            // pure rotation
 
-    if (heading_settled()) {
-        drive_stop();
-        return true;
-    }
-    return false;
-}
+//     if (heading_settled()) {
+//         drive_stop();
+//         return true;
+//     }
+//     return false;
+// }

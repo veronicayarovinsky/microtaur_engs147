@@ -230,11 +230,6 @@ int voltage_to_pwm(float volt) {
     return pwm;
 }
 
-static float wrap_pi(float a) {
-    while (a >  PI) a -= 2.0f * PI;
-    while (a < -PI) a += 2.0f * PI;
-    return a;
-}
 
 // position_controller: setpoint-in lead+integrator. target [mm] -> body velocity [mm/s]
 float position_controller(float target_mm) {
