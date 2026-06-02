@@ -56,6 +56,12 @@ void setup() {
     drive_init();
     flood_init();
 
+    while (!S) {}
+
+    while (!Micromouse::imu.ready) {
+        imu_update();
+        delay(50);
+    }
 
     delay(SETUP_DELAY_MS);
     S.println("Done initializing. Moving to ");
@@ -179,5 +185,7 @@ void loop() {
         // Do nothing
     }
     
-    update_controllers(drive_command.v_base_mm_s, drive_command.heading_ref_rad);
+    if (state != State::TURNING) {
+        update_controllers(drive_command.v_base_mm_s, drive_command.heading_ref_rad);
+    }
     }
